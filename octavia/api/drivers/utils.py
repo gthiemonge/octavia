@@ -130,6 +130,7 @@ def lb_dict_to_provider_dict(lb_dict, vip=None, add_vips=None, db_pools=None,
         new_lb_dict['vip_port_id'] = vip.port_id
         new_lb_dict['vip_subnet_id'] = vip.subnet_id
         new_lb_dict['vip_qos_policy_id'] = vip.qos_policy_id
+        new_lb_dict['vip_sg_id'] = vip.sg_id
     if 'flavor_id' in lb_dict and lb_dict['flavor_id']:
         flavor_repo = repositories.FlavorRepository()
         session = db_api.get_session()
@@ -565,6 +566,8 @@ def vip_dict_to_provider_dict(vip_dict):
         new_vip_dict['vip_subnet_id'] = vip_dict['subnet_id']
     if 'qos_policy_id' in vip_dict:
         new_vip_dict['vip_qos_policy_id'] = vip_dict['qos_policy_id']
+    if 'sg_id' in vip_dict:
+        new_vip_dict['vip_sg_id'] = vip_dict['sg_id']
     if constants.OCTAVIA_OWNED in vip_dict:
         new_vip_dict[constants.OCTAVIA_OWNED] = vip_dict[
             constants.OCTAVIA_OWNED]
@@ -596,6 +599,8 @@ def provider_vip_dict_to_vip_obj(vip_dictionary):
         vip_obj.subnet_id = vip_dictionary['vip_subnet_id']
     if 'vip_qos_policy_id' in vip_dictionary:
         vip_obj.qos_policy_id = vip_dictionary['vip_qos_policy_id']
+    if 'vip_sg_id' in vip_dictionary:
+        vip_obj.sg_id = vip_dictionary['vip_sg_id']
     if constants.OCTAVIA_OWNED in vip_dictionary:
         vip_obj.octavia_owned = vip_dictionary[constants.OCTAVIA_OWNED]
     return vip_obj
