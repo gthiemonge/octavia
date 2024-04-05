@@ -386,6 +386,18 @@ def network_exists_optionally_contains_subnet(network_id, subnet_id=None,
     return network
 
 
+def security_group_exists(sg_id, context=None):
+    """Raises an exception when a security group does not exist."""
+    network_driver = utils.get_network_driver()
+    try:
+        subnet = network_driver.get_security_group_by_id(sg_id,
+                                                         context=context)
+    except Exception as e:
+        raise exceptions.InvalidSubresource(
+            resource='Security Group', id=sg_id) from e
+    return subnet
+
+
 def network_allowed_by_config(network_id, valid_networks=None):
     if CONF.networking.valid_vip_networks and not valid_networks:
         valid_networks = CONF.networking.valid_vip_networks

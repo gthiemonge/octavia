@@ -307,6 +307,11 @@ class LoadBalancersController(base.BaseController):
         # Multi-vip validation for ensuring subnets are "sane"
         self._validate_subnets_share_network_but_no_duplicates(load_balancer)
 
+        # Validate optional security groups
+        if load_balancer.vip_sg_ids:
+            for sg_id in load_balancer.vip_sg_ids:
+                validate.security_group_exists(sg_id, context=context)
+
     @staticmethod
     def _create_vip_port_if_not_exist(load_balancer_db):
         """Create vip port."""
@@ -433,7 +438,7 @@ class LoadBalancersController(base.BaseController):
 
     @wsme_pecan.wsexpose(lb_types.LoadBalancerFullRootResponse,
                          body=lb_types.LoadBalancerRootPOST, status_code=201)
-    def post(self, load_balancer):
+    def post(self, load_balancer: lb_types.LoadBalancerRootPOST):
         """Creates a load balancer."""
         load_balancer = load_balancer.loadbalancer
         context = pecan_request.context.get('octavia_context')
