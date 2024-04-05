@@ -294,9 +294,19 @@ class AbstractNetworkDriver(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_security_group(self, sg_name):
-        """Retrieves the security group by it's name.
+        """Retrieves the security group by its name.
 
         :param sg_name: The security group name.
+        :return: octavia.network.data_models.SecurityGroup, None if not enabled
+        :raises: NetworkException, SecurityGroupNotFound
+        """
+
+    @abc.abstractmethod
+    def get_security_group_by_id(self, sg_id, context=None):
+        """Retrieves the security group by its id.
+
+        :param sg_id: The security group ID.
+        :param context: A request context
         :return: octavia.network.data_models.SecurityGroup, None if not enabled
         :raises: NetworkException, SecurityGroupNotFound
         """

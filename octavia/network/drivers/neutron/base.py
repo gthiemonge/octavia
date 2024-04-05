@@ -252,6 +252,9 @@ class BaseNeutronDriver(base.AbstractNetworkDriver):
     def get_port(self, port_id, context=None):
         return self._get_resource('port', port_id, context=context)
 
+    def get_security_group_by_id(self, sg_id, context=None):
+        return self._get_resource('security_group', sg_id, context=context)
+
     def get_network_by_name(self, network_name):
         return self._get_resources_by_filters(
             'network', unique_item=True, name=network_name)
