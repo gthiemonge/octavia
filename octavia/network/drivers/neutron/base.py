@@ -83,14 +83,16 @@ class BaseNeutronDriver(base.AbstractNetworkDriver):
                                           port_id=port.id,
                                           load_balancer=load_balancer,
                                           load_balancer_id=load_balancer.id,
-                                          octavia_owned=octavia_owned)
+                                          octavia_owned=octavia_owned,
+                                          sgs=load_balancer.vip.sgs)
         else:
             primary_vip = data_models.Vip(ip_address=None, subnet_id=None,
                                           network_id=port.network_id,
                                           port_id=port.id,
                                           load_balancer=load_balancer,
                                           load_balancer_id=load_balancer.id,
-                                          octavia_owned=octavia_owned)
+                                          octavia_owned=octavia_owned,
+                                          sgs=load_balancer.vip.sgs)
         additional_vips = [
             data_models.AdditionalVip(
                 ip_address=add_fixed_ip.ip_address,
@@ -123,11 +125,11 @@ class BaseNeutronDriver(base.AbstractNetworkDriver):
         self.network_proxy.update_port(port_id,
                                        allowed_address_pairs=aap)
 
-    def _add_security_group_to_port(self, sec_grp_id, port_id):
+    def _update_security_groups(self, sec_grp_ids, port_id):
         # Note: Neutron accepts the SG even if it already exists
         try:
             self.network_proxy.update_port(
-                port_id, security_groups=[sec_grp_id])
+                port_id, security_groups=sec_grp_ids)
         except os_exceptions.NotFoundException as e:
             raise base.PortNotFound(str(e))
         except Exception as e:

@@ -607,7 +607,10 @@ class AllocateVIP(BaseNetworkTask):
             LOG.debug('Allocated an additional VIP: subnet=%(subnet)s '
                       'ip_address=%(ip)s', {'subnet': add_vip.subnet_id,
                                             'ip': add_vip.ip_address})
-        return (vip.to_dict(),
+        vip_dict = vip.to_dict()
+        for vip_sg in vip.sgs:
+            vip_dict["sgs"].append(vip_sg.sg_id)
+        return (vip_dict,
                 [additional_vip.to_dict()
                  for additional_vip in additional_vips])
 
@@ -963,16 +966,22 @@ class CreateVIPBasePort(BaseNetworkTask):
     def execute(self, vip, vip_sg_id, amphora_id, additional_vips):
         port_name = constants.AMP_BASE_PORT_PREFIX + amphora_id
         fixed_ips = [{constants.SUBNET_ID: vip[constants.SUBNET_ID]}]
-        sg_id = []
+        sg_ids = []
+        # To remove some confusion:
+        # - vip_sg_id is the ID of the SG created by Octavia for the LB.
+        # - vip['sg_id'] is the ID of the SG provided by the user for the LB.
         if vip_sg_id:
-            sg_id = [vip_sg_id]
+            sg_ids = [vip_sg_id]
+        LOG.debug(f"GTh vip={vip}")
+        if vip["sgs"]:
+            sg_ids += vip["sgs"]
         secondary_ips = [vip[constants.IP_ADDRESS]]
         for add_vip in additional_vips:
             secondary_ips.append(add_vip[constants.IP_ADDRESS])
         port = self.network_driver.create_port(
             vip[constants.NETWORK_ID], name=port_name, fixed_ips=fixed_ips,
             secondary_ips=secondary_ips,
-            security_group_ids=sg_id,
+            security_group_ids=sg_ids,
             qos_policy_id=vip[constants.QOS_POLICY_ID])
         LOG.info('Created port %s with ID %s for amphora %s',
                  port_name, port.id, amphora_id)
