@@ -130,7 +130,7 @@ def lb_dict_to_provider_dict(lb_dict, vip=None, add_vips=None, db_pools=None,
         new_lb_dict['vip_port_id'] = vip.port_id
         new_lb_dict['vip_subnet_id'] = vip.subnet_id
         new_lb_dict['vip_qos_policy_id'] = vip.qos_policy_id
-        new_lb_dict['vip_sg_id'] = vip.sg_id
+        new_lb_dict['vip_sg_ids'] = [vip_sg.sg_id for vip_sg in vip.sgs]
     if 'flavor_id' in lb_dict and lb_dict['flavor_id']:
         flavor_repo = repositories.FlavorRepository()
         session = db_api.get_session()

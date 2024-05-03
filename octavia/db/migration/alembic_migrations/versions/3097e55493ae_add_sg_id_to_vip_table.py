@@ -28,6 +28,12 @@ down_revision = 'db2a73e82626'
 
 
 def upgrade():
-    op.add_column(
-        'vip',
-        sa.Column('sg_id', sa.String(36), nullable=True))
+    op.create_table(
+        "vip_security_group",
+        sa.Column("load_balancer_id", sa.String(36), nullable=False),
+        sa.Column("sg_id", sa.String(36), nullable=False),
+        sa.ForeignKeyConstraint(["load_balancer_id"],
+                                ["vip.load_balancer_id"],
+                                name="fk_vip_sg_vip_lb_id"),
+        sa.PrimaryKeyConstraint("load_balancer_id", "sg_id")
+    )

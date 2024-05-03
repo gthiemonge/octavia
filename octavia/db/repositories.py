@@ -253,9 +253,15 @@ class Repositories:
             lb_dict['id'] = uuidutils.generate_uuid()
         lb = models.LoadBalancer(**lb_dict)
         session.add(lb)
+        vip_sg_ids = vip_dict.pop("sg_ids", [])
         vip_dict['load_balancer_id'] = lb_dict['id']
         vip = models.Vip(**vip_dict)
         session.add(vip)
+        for vip_sg_id in vip_sg_ids:
+            vip_sg = models.VipSecurityGroup(
+                load_balancer_id=lb_dict['id'],
+                sg_id=vip_sg_id)
+            session.add(vip_sg)
         for add_vip_dict in additional_vip_dicts:
             add_vip_dict['load_balancer_id'] = lb_dict['id']
             add_vip_dict['network_id'] = vip_dict.get('network_id')
